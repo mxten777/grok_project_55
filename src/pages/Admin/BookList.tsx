@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 // import { collection, getDocs } from 'firebase/firestore';
 // import { db } from '../../lib/firebase';
+import { mockBooks } from '../../data/mockBooks';
 
 interface Book {
   id: string;
@@ -24,18 +25,14 @@ const BookList: React.FC = () => {
 
   useEffect(() => {
     const fetchBooks = async () => {
-      // Mock data - expanded
-      const mockBooks: Book[] = [
-        { id: '1', title: '살인자의 기억법', author: '김영하', isAvailable: true },
-        { id: '2', title: '채식주의자', author: '한강', isAvailable: false },
-        { id: '3', title: '82년생 김지영', author: '조남주', isAvailable: true },
-        { id: '4', title: '시선으로부터', author: '정세랑', isAvailable: true },
-        { id: '5', title: '달러구트 꿈 백화점', author: '이미예', isAvailable: false },
-        { id: '6', title: '아버지의 해방일지', author: '정지아', isAvailable: true },
-        { id: '7', title: '불편한 편의점', author: '김호연', isAvailable: true },
-        { id: '8', title: '소년이 온다', author: '한강', isAvailable: false },
-      ];
-      setBooks(mockBooks);
+      // Mock data - using shared mockBooks
+      const adminBooks: Book[] = mockBooks.map(book => ({
+        id: book.id,
+        title: book.title,
+        author: book.author,
+        isAvailable: book.isAvailable
+      }));
+      setBooks(adminBooks);
     };
     fetchBooks();
   }, []);

@@ -41,3 +41,6 @@ workbox-*.js
 .env.development.local
 .env.test.local
 .env.production.local
+
+.vercel
+.env*.local

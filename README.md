@@ -1,344 +1,237 @@
-# 📚 도서관 OPAC 시스템 기획서
+# 📚 도서관 OPAC 시스템
 
-## 🎯 프로젝트 개요
-공공도서관/작은도서관용 SaaS 도서 검색(OPAC) 웹앱 MVP
+> 공공도서관/작은도서관용 SaaS 도서 검색 웹앱 MVP
 
-### 기술 스택 (절대 변경 금지)
-- ✅ Vite + React 18/19 + TypeScript
-- ✅ TailwindCSS 3.4+
-- ✅ Firebase (Auth, Firestore, Storage, Functions)
-- ✅ Vercel 배포
-- ✅ Framer Motion 활용
-- ✅ PWA 지원
+[![Vercel](https://vercel.com/button)](https://grok-project-55-kcyh2zm5b-dongyeol-jungs-projects.vercel.app/)
 
----
+## 🚀 빠른 시작
 
-## 🗂️ 목차
-- [프로젝트 목표](#프로젝트-목표)
-- [사용자 기능](#사용자-기능)
-- [관리자 기능](#관리자-기능)
-- [Firestore DB 구조](#firestore-db-구조)
-- [UI/UX 구조](#uiux-구조)
-- [OPAC 기능 상세](#opac-기능-상세)
-- [검색 알고리즘](#검색-알고리즘)
-- [React 페이지 구조](#react-페이지-구조)
-- [API 의사코드](#api-의사코드)
-- [도서 상세 UI 컴포넌트](#도서-상세-ui-컴포넌트)
-- [코드 폴더 구조](#코드-폴더-구조)
-- [확장 기능 로드맵](#확장-기능-로드맵)
-- [Vercel 배포 가이드](#vercel-배포-가이드)
+### 기술 스택
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: TailwindCSS 3.4+
+- **Backend**: Firebase (Auth, Firestore, Storage, Functions)
+- **배포**: Vercel
+- **PWA**: Service Worker 지원
 
----
+### 주요 기능
+- 🔍 실시간 도서 검색 (자동완성, 필터링)
+- 📱 모바일/PWA 최적화
+- 📖 도서 상세 정보 및 QR 공유
+- 👨‍💼 관리자 도서 관리 시스템
+- 📊 검색 통계 및 분석
 
-## 🎯 프로젝트 목표
-- 모바일/PWA 최적화 도서 검색
-- Firestore Index 기반 즉시 반응형 검색
-- 실시간 대출 가능 여부 표시
-- QR 공유 기능
-- 관리자용 도서 관리 시스템
+## 🛠️ 설치 및 실행
 
----
+```bash
+# 의존성 설치
+npm install
 
-## 👤 사용자 기능
-- [x] 검색창: 자동완성, 최근 검색
-- [x] 필터: 대출가능/불가, 분야별 카테고리, 출간연도
-- [x] 도서 상세: 표지, 소개, ISBN, 소장위치, 재고
-- [x] QR 공유 (도서 상세 페이지)
-- [x] 인기 도서 / 신착 도서 / 테마 큐레이션 (슬라이드 구현)
-- [x] PWA 홈화면 설치 가능 (manifest.json 추가)
+# 개발 서버 실행
+npm run dev
 
----
+# 빌드
+npm run build
 
-## 🛠️ 관리자 기능
-- [x] 도서 등록/수정/삭제 (표지 업로드 포함)
-- [x] CSV 업로드로 대량 등록
-- [x] 장서 점검(Inventory)
-- [x] 대출 가능/불가 상태 수동 변경
-- [x] 분류/카테고리 관리
-- [x] 통계(검색량, 인기 검색어, 대출연동 대비 가능)
-
----
-
-## 🗃️ Firestore DB 구조
-
-### 📚 /books/{bookId}
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| title | string | 도서 제목 |
-| author | string | 저자 |
-| publisher | string | 출판사 |
-| isbn | string | ISBN13 |
-| categories | array | 예: ["문학", "소설", "한국문학"] |
-| keywords | array | 검색 키워드 |
-| publishYear | number | 출간연도 |
-| shelfLocation | map | 층/열람실/서가/행/칸 정보 |
-| coverImageUrl | string | 표지 이미지 URL |
-| isAvailable | boolean | 대출 가능 여부 |
-| createdAt | timestamp | 최초 등록일 |
-| updatedAt | timestamp | 수정일 |
-
-### 🧾 /searchLogs/{logId}
-- keyword: string
-- userId: string
-- timestamp: timestamp
-- → 인기 검색어 기반 통계 가능
-
-### ⚙️ /admin/settings
-- categoriesMaster: array
-- shelfMap: map
-- importCSVConfig: map
-- autoSyncEnabled: boolean
-
----
-
-## 🎨 UI/UX 구조 (모바일 최적화 + PWA)
-
-### 사용자 화면
-1. **홈**
-   - 검색창
-   - 인기 검색어
-   - 신착도서 슬라이드
-   - 테마 큐레이션
-
-2. **검색 결과**
-   - 표지 이미지
-   - 제목/저자/출판사
-   - 대출 가능 여부
-   - 필터: 신착/가능한 책/카테고리
-
-3. **도서 상세**
-   - 표지
-   - 서가 위치 지도(텍스트 또는 미니맵)
-   - 대출 여부
-   - 유사 도서 추천
-   - QR 공유
-
-### 관리자 화면
-1. 도서 목록
-2. 도서 등록/수정
-3. 책 표지 업로드(Storage)
-4. CSV 업로드
-5. 카테고리/서가 설정
-6. 검색 통계
-
----
-
-## 🔍 OPAC 기능 상세 정의
-
-### 검색 기능
-- 제목, 저자, 출판사, ISBN
-- 자동완성 (검색로그 기반)
-- 정렬: 최신순, 인기순
-
-### 도서 상세
-- 표지 이미지
-- 책 설명/소개문
-- 저자 정보
-- 서가 위치: 2층 열람실 → A구역 → 3번 선반 → 4번째 칸
-- 대출 여부 표시
-- QR 공유
-
-### 필터 기능
-- 대출가능 도서만 보기
-- 신착(최근 60일)
-- 카테고리(문학/과학/IT/아동 등)
-- 출간연도
-
----
-
-## ⚡ 검색 알고리즘 설계 (속도↑ 정확도↑)
-
-### 기본 원칙
-- Firestore 단독 검색의 한계 → 인덱스 기반 구조 + keywords 최적화
-- 제목/저자/키워드 세 필드 중심 검색
-
-### 데이터 예시
-```json
-keywords: [
-  "김영하",
-  "살인자의기억법",
-  "스릴러",
-  "한국문학",
-  "범죄소설",
-  "베스트셀러"
-]
+# 미리보기
+npm run preview
 ```
 
-### 추천 검색 알고리즘
-1. title, author에서 시작
-2. keywords 배열에 매칭
-3. 인기 검색어 기반 가중치 조정
-4. Firestore 복합 인덱스 사용
+### 환경변수 설정 (.env.local)
 
-### 성능 향상 필요 시
-- Firebase Functions + Algolia 검색엔진 연동(고급 버전)
-
----
-
-## 🖥️ React 페이지 구조
-
-### 사용자 페이지
-- `Home.tsx` - 메인 검색 페이지 (인기 도서 슬라이드 포함)
-- `SearchResult.tsx` - 검색 결과 및 필터 (URL 쿼리 파라미터 지원)
-- `BookDetail.tsx` - 도서 상세 정보 (QR 공유 포함)
-
-### 관리자 페이지
-- `Admin/BookList.tsx` - 도서 목록 관리 (네비게이션 링크 추가)
-- `Admin/BookEdit.tsx` - 도서 등록/수정 (폼 검증 및 mock 저장)
-- `Admin/UploadCSV.tsx` - CSV 대량 업로드 (PapaParse로 파싱 및 미리보기)
-
-### 컴포넌트
-- `BookCard.tsx` - 도서 카드 (클릭 시 상세 페이지 이동)
-- `SearchBar.tsx` - 검색창 (홈에서는 검색 결과 페이지로 이동)
-- `FilterPanel.tsx` - 필터 옵션
-- `QRShare.tsx` - QR 코드 공유
-
----
-
-## 🔧 API 의사코드
-
-### 검색 API
-```javascript
-async function searchBooks(query, filters) {
-  const q = query(collection(db, 'books'),
-    where('keywords', 'array-contains-any', query.split(' ')),
-    where('isAvailable', '==', filters.availableOnly ? true : any),
-    orderBy('createdAt', 'desc'),
-    limit(50)
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
+```bash
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
+VITE_FIREBASE_APP_ID=your_app_id
 ```
 
-### 도서 등록 API
-```javascript
-async function addBook(bookData) {
-  const docRef = await addDoc(collection(db, 'books'), {
-    ...bookData,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  });
-  return docRef.id;
-}
-```
-
-### CSV 업로드 API (Firebase Functions)
-```javascript
-exports.processCSV = functions.https.onCall(async (data, context) => {
-  const csvData = parseCSV(data.csvContent);
-  const batch = db.batch();
-  csvData.forEach(book => {
-    const docRef = db.collection('books').doc();
-    batch.set(docRef, { ...book, createdAt: admin.firestore.FieldValue.serverTimestamp() });
-  });
-  await batch.commit();
-  return { success: true, count: csvData.length };
-});
-```
-
----
-
-## 🎨 도서 상세 UI 컴포넌트 설계
-
-```tsx
-<BookDetail book={book}>
-  <BookCover image={book.coverImageUrl} />
-  <BookInfo title={book.title} author={book.author} />
-  <ShelfLocation location={book.shelfLocation} />
-  <AvailabilityStatus isAvailable={book.isAvailable} />
-  <QRShare url={window.location.href} />
-  <RelatedBooks books={relatedBooks} />
-</BookDetail>
-```
-
-### 주요 컴포넌트
-- BookCard: 검색 결과 아이템
-- SearchBar: 자동완성 검색창
-- FilterPanel: 필터 옵션
-- BookDetail: 상세 정보 레이아웃
-
----
-
-## 📁 코드 폴더 구조
+## 📁 프로젝트 구조
 
 ```
 src/
-  pages/
-    Home.tsx
-    SearchResult.tsx
-    BookDetail.tsx
-    Admin/
-      BookList.tsx
-      BookEdit.tsx
-      UploadCSV.tsx
-  components/
-    BookCard.tsx
-    SearchBar.tsx
-    FilterPanel.tsx
-  hooks/
-    useSearch.ts
-  lib/
-    firebase.ts
-  styles/
-    globals.css
-public/
-  icons/
-functions/
-  processCSV.js
-  syncSearchIndex.js
+├── components/          # 재사용 컴포넌트
+│   ├── BookCard.tsx    # 도서 카드
+│   ├── SearchBar.tsx   # 검색바 (자동완성)
+│   ├── FilterPanel.tsx # 필터 패널
+│   └── QRShare.tsx     # QR 공유
+├── pages/              # 페이지 컴포넌트
+│   ├── Home.tsx        # 홈페이지
+│   ├── SearchResult.tsx # 검색 결과
+│   ├── BookDetail.tsx  # 도서 상세
+│   └── Admin/          # 관리자 페이지
+├── hooks/              # 커스텀 훅
+│   └── useSearch.ts    # 검색 로직
+├── data/               # 데이터 파일
+│   └── mockBooks.ts    # 목업 데이터
+├── types/              # TypeScript 타입 정의
+│   └── book.ts         # 도서 관련 타입
+├── lib/                # 유틸리티
+│   └── firebase.ts     # Firebase 설정
+└── styles/             # 스타일링
+
+public/                 # 정적 파일
+├── icons/              # PWA 아이콘
+└── manifest.json       # PWA 설정
+
+functions/              # Firebase Functions
+├── processCSV.js       # CSV 처리
+└── syncSearchIndex.js  # 검색 인덱스 동기화
 ```
 
----
+## ✨ 주요 기능
 
-## 🚀 확장 기능 로드맵
+### 👤 사용자 기능
 
-### 1차 확장
-- [ ] AI 기반 도서 추천
-- [ ] 맞춤형 큐레이션
-- [ ] 음성검색
+#### 검색 및 탐색
+- **실시간 검색**: 제목, 저자, 출판사, 키워드 검색
+- **자동완성**: 최근 검색어 + 인기 키워드 추천
+- **고급 필터**: 대출가능, 카테고리, 출간연도 필터링
+- **정렬 옵션**: 최신순, 인기순, 제목순
 
-### 2차 확장
-- [ ] 대출/반납 연계
-- [ ] 전자책 통합검색
+#### 도서 정보
+- **상세 정보**: 표지, 저자, 출판사, ISBN, 카테고리
+- **소장 위치**: 층/실/구역/행/칸 상세 표시
+- **대출 상태**: 실시간 대출 가능 여부 표시
+- **QR 공유**: 도서 정보 모바일 공유
 
-### 3차 확장 (지자체용)
-- [ ] 분관 통합 도서 검색
-- [ ] 도서관 전체 인기 도서 TOP100 자동 생성
+#### PWA 기능
+- **홈화면 설치**: 모바일 앱처럼 설치 가능
+- **오프라인 지원**: 캐싱된 콘텐츠 오프라인 접근
 
----
+### 👨‍💼 관리자 기능
 
-## ☁️ Vercel 배포 가이드
+#### 도서 관리
+- **CRUD 작업**: 도서 등록/수정/삭제
+- **대량 업로드**: CSV 파일로 수백 권 동시 등록
+- **이미지 업로드**: 표지 이미지 Firebase Storage 연동
+- **카테고리 관리**: 도서 분류 체계 관리
 
-### 1. Vercel 계정 생성
-- vercel.com 접속
-- GitHub 연동
+#### 통계 및 모니터링
+- **검색 통계**: 인기 검색어, 검색량 분석
+- **대출 현황**: 실시간 대출 상태 모니터링
 
-### 2. 프로젝트 배포
+## 🗄️ 데이터베이스 구조
+
+### Books 컬렉션
+```typescript
+interface Book {
+  id: string;
+  title: string;           // 도서 제목
+  author: string;          // 저자
+  publisher: string;       // 출판사
+  isbn: string;           // ISBN13
+  categories: string[];   // 카테고리
+  keywords: string[];     // 검색 키워드
+  publishYear: number;    // 출간연도
+  shelfLocation: {        // 서가 위치
+    floor: string;
+    room: string;
+    section: string;
+    row: string;
+    column: string;
+  };
+  coverImageUrl: string;  // 표지 URL
+  isAvailable: boolean;   // 대출 가능 여부
+  createdAt: Date;        // 생성일
+  updatedAt: Date;        // 수정일
+}
+```
+
+### Search Logs 컬렉션
+```typescript
+interface SearchLog {
+  keyword: string;        // 검색어
+  userId?: string;        // 사용자 ID
+  timestamp: Date;        // 검색 시간
+  resultCount: number;    // 결과 수
+}
+```
+
+## 🚀 배포 가이드
+
+### Vercel 자동 배포
+프로젝트가 GitHub에 연결되어 자동 배포됩니다.
+
+### 수동 배포
 ```bash
-npm install -g vercel
+# Vercel CLI 설치
+npm i -g vercel
+
+# 로그인
+vercel login
+
+# 배포
 vercel --prod
 ```
 
-### 3. 환경변수 설정
-- VERCEL_ENV: production
-- FIREBASE_CONFIG: your-firebase-config-json
+### 환경변수 설정
+Vercel Dashboard에서 다음 변수를 설정:
+- `VITE_FIREBASE_*`: Firebase 설정 값들
+- `VERCEL_ENV`: production
 
-### 4. PWA 설정 확인
-- manifest.json 생성
-- Service Worker 등록 확인
+## 💻 개발 가이드
 
-### 5. 도메인 연결 (선택)
-- vercel.com에서 커스텀 도메인 설정
+### 코드 스타일
+- **TypeScript**: 엄격한 타입 체크
+- **ESLint**: 코드 품질 유지
+- **Prettier**: 일관된 코드 포맷팅
+
+### 테스트 실행
+```bash
+# 빌드 테스트
+npm run build
+```
+
+### Git 워크플로우
+```bash
+# 기능 브랜치 생성
+git checkout -b feature/new-feature
+
+# 커밋
+git commit -m "feat: 새로운 기능 추가"
+
+# 푸시
+git push origin feature/new-feature
+
+# PR 생성 후 main 병합
+```
+
+## 🔮 로드맵
+
+### Phase 1 (현재) ✅
+- 기본 검색 기능
+- 관리자 도서 관리
+- PWA 지원
+- Vercel 배포
+
+### Phase 2 (다음)
+- AI 기반 추천 시스템
+- 사용자 맞춤 큐레이션
+- 음성 검색
+- 대출/반납 연동
+
+### Phase 3 (확장)
+- 전자책 통합 검색
+- 다중 도서관 연동
+- 고급 분석 대시보드
+- 모바일 앱 개발
+
+## 📞 지원 및 문의
+
+### 문서
+- [상세 기술 문서](./PROJECT_DOCUMENTATION.md)
+- [API 레퍼런스](./api/)
+- [배포 가이드](./deployment/)
+
+### 이슈 및 피드백
+- **GitHub Issues**: 버그 리포트 및 기능 요청
+- **Discussions**: 일반 토론 및 Q&A
+
+### 라이선스
+MIT License - 자유로운 사용 및 수정 가능
 
 ---
 
-## 📝 개발 노트
-- Firestore 보안 규칙 설정 필수
-- Firebase Functions 배포 필요
-- 모바일 테스트 필수
-- SEO 최적화 고려
-
----
-
-*이 기획서는 Notion에서 작성되었으며, 실제 구현 시 세부 사항 조정 가능*
+*개발: GitHub Copilot | 배포: Vercel | DB: Firebase*
