@@ -18,18 +18,39 @@ const SearchResult: React.FC = () => {
         <div className="flex justify-center mb-8">
           <SearchBar />
         </div>
-        <div className="flex">
-          <div className="w-1/4 pr-4">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="lg:w-1/4">
             <FilterPanel filters={filters} onFilterChange={setFilters} />
           </div>
-          <div className="w-3/4">
-            <h2 className="text-2xl font-semibold mb-4">검색 결과: "{searchTerm}"</h2>
-            {loading && <p>Loading...</p>}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {books.map((book) => (
-                <BookCard key={book.id} book={book} />
-              ))}
+          <div className="lg:w-3/4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                검색 결과: <span className="text-blue-600">"{searchTerm}"</span>
+              </h2>
+              <div className="text-sm text-gray-500">
+                {books.length}권의 도서
+              </div>
             </div>
+            {loading && (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-gray-600">검색 중...</span>
+              </div>
+            )}
+            {!loading && books.length === 0 && (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">📚</div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">검색 결과가 없습니다</h3>
+                <p className="text-gray-600">다른 검색어로 시도해보세요</p>
+              </div>
+            )}
+            {!loading && books.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {books.map((book) => (
+                  <BookCard key={book.id} book={book} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
